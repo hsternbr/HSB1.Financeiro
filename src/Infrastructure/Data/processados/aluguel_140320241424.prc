@@ -1,0 +1,2 @@
+Chave;CNPJFornec;Fornecedor;Especie;Emissao;TipoNota;NumeroNota;Serie;NumeroFatura;TotalNF;Valor;ValorBaseICMS;AliqICMS;Vencimento;Emp;Conta;Sconta;CC1;CC2;Projeto;GrupoPagto;CNPJConta;Competencia;DtGL;TipoCarga;EmpresaPgto;ChaveNFS;TipoServico;DebitoAutomatico
+TAXA DE INCÊNDIO - N° CBMERJ 0278769-5;028176998/0004-41;FUNDO ESPECIAL DO CORPO DE BOMBEIROS - RJ;82;01/03/2024;BOLETO SEM NOTA;7316666;0;;244,33;244,33;0;0;15/03/2024;01;3311010;90000;10006;10006;00000;ELETRONICO;0;032024;01/03/2024;ALUGUEL;RIO - MATRIZ;;;;

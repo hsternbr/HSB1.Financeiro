@@ -1,0 +1,190 @@
+
+POST https://sap-hstern-sl.skyinone.net:50000/b1s/v1/Login HTTP/1.1
+content-type: application/json
+
+{
+    "UserName": "LEONARDO.CARVALHO",
+    "Password": "654321",
+    "CompanyDB": "TESTE_INTEGRADO_HS"
+}
+
+###
+POST https://sap-hstern-sl.skyinone.net:50000/b1s/v1/PurchaseInvoices
+content-type: application/json
+
+{
+    "DocDate": "2023-12-24",
+    "DocDueDate": "2024-01-06",
+    "TaxDate": "2023-12-19",
+    "CardCode": "S2307545",
+    "SeriesString": "0",
+    "SequenceSerial": "52988",
+    "BPL_IDAssignedToInvoice": 56,
+    "SequenceModel": 0,
+    "SequenceCode": -2,
+    "U_ChaveAcesso": "",
+    "DocumentLines": [{
+            "ItemCode": "1006389",
+            "Description": "52988/0 | 2710-0077",
+            "FreeText": "52988/0 | 2710-0077",
+            "Quantity": 1,
+            "Price": "9.26",
+            "PriceAfterVAT": "9.26",
+            "UnitPrice": "9.26",
+            "Usage": null,
+            "CostingCode": "10291",
+            "CostingCode2": "R10291",
+            "CostingCode5": "UF10001",
+            "CostingCode3": "P00000",
+            "CSTCode": "0.90",
+            "TaxCode": "HSCODE54",
+            "CFOPCode": "1303",
+            "AccountCode": "3315010.00020",
+            "FreeOfChargeBP": "tNO",
+            "LineTaxJurisdictions": [{
+                    "JurisdictionCode": "ICMSX52",
+                    "JurisdictionType": 31,
+                    "TaxAmount": 0,
+                    "TaxAmountSC": 0,
+                    "TaxAmountFC": 0,
+                    "TaxRate": "20",
+                    "ExternalCalcTaxRate": "20",
+                    "BaseSum": 0,
+                    "TaxInPrice": "tYES",
+                    "U_Outros": "31.45",
+                    "ExternalCalcTaxAmount": 0
+                }
+            ]
+        }, {
+            "ItemCode": "1006389",
+            "Description": "52988/0 | 2711-5588",
+            "FreeText": "52988/0 | 2711-5588",
+            "Quantity": 1,
+            "Price": "0.41",
+            "PriceAfterVAT": "0.41",
+            "UnitPrice": "0.41",
+            "Usage": null,
+            "CostingCode": "10291",
+            "CostingCode2": "R10291",
+            "CostingCode5": "UF10001",
+            "CostingCode3": "P00000",
+            "CSTCode": "0.90",
+            "TaxCode": "HSCODE54",
+            "CFOPCode": "1303",
+            "AccountCode": "3315010.00020",
+            "FreeOfChargeBP": "tNO",
+            "LineTaxJurisdictions": [{
+                    "JurisdictionCode": "ICMSX52",
+                    "JurisdictionType": 31,
+                    "TaxAmount": 0,
+                    "TaxAmountSC": 0,
+                    "TaxAmountFC": 0,
+                    "TaxRate": "20",
+                    "ExternalCalcTaxRate": "20",
+                    "BaseSum": 0,
+                    "TaxInPrice": "tYES",
+                    "U_Outros": "31.45",
+                    "ExternalCalcTaxAmount": 0
+                }
+            ]
+        }, {
+            "ItemCode": "1006389",
+            "Description": "52988/0 | 3205-5517",
+            "FreeText": "52988/0 | 3205-5517",
+            "Quantity": 1,
+            "Price": "21.78",
+            "PriceAfterVAT": "21.78",
+            "UnitPrice": "21.78",
+            "Usage": null,
+            "CostingCode": "10291",
+            "CostingCode2": "R10291",
+            "CostingCode5": "UF10001",
+            "CostingCode3": "P00000",
+            "CSTCode": "0.90",
+            "TaxCode": "HSCODE54",
+            "CFOPCode": "1303",
+            "AccountCode": "3315010.00020",
+            "FreeOfChargeBP": "tNO",
+            "LineTaxJurisdictions": [{
+                    "JurisdictionCode": "ICMSX52",
+                    "JurisdictionType": 31,
+                    "TaxAmount": 0,
+                    "TaxAmountSC": 0,
+                    "TaxAmountFC": 0,
+                    "TaxRate": "20",
+                    "ExternalCalcTaxRate": "20",
+                    "BaseSum": 0,
+                    "TaxInPrice": "tYES",
+                    "U_Outros": "31.45",
+                    "ExternalCalcTaxAmount": 0
+                }
+            ]
+        }
+    ],
+    "DocumentInstallments": [{
+            "DueDate": "2024-01-06",
+            "Total": "31.45",
+            "U_LinhaDigitavel": null
+        }
+    ]
+}
+
+
+###
+PATCH https://sap-hstern-sl.skyinone.net:50000/b1s/v1/SQLQueries('HSCustoMedio') HTTP/1.1
+content-type: application/json
+
+{
+    "SqlCode" : "HSCustoMedio",
+    "SqlName" : "QueryCustoMedioPorItem",
+    "SqlText" : "SELECT T1.\"ItemCode\", T1.\"WhsCode\", T1.\"OnHand\", T1.\"AvgPrice\",T0.\"U_MW_ChvLeg1\" as \"Merc_Num\",T0.\"U_MW_ChvLeg2\" as \"Comp_Fiscal_Num\" FROM OITM T0  INNER JOIN OITW T1 ON T0.\"ItemCode\" = T1.\"ItemCode\" WHERE (T1.\"AvgPrice\" <> 0 or T1.\"OnHand\" <> 0)"
+
+}
+
+GET https://sap-hstern-sl.skyinone.net:50000/b1s/v1/SQLQueries('QAttachment')
+
+GET https://193.123.108.195:50000/b1s/v1/SQLQueries('QAttachment')/List?Fornecedor='%GOLD%'
+
+###
+GET https://sap-hstern-sl.skyinone.net:50000/b1s/v1/SQLQueries('HSCustoMedio')/List?&$skip=0
+//Prefer: odata.maxpagesize=50
+
+GET https://sap-hstern-sl-hana.skyinone.net:50000/b1s/v1/SQLQueries('QAttachment')/List
+
+GET https://193.123.108.195:50000/b1s/v1/UserQueries(InternalKey=304,QueryCategory=21)
+
+
+"SELECT \"DocDueDate\", \"DocNum\", \"CardName\", \"DocTotal\" FROM \"OPCH\" T0 WHERE \"AtcEntry\" is null and \"CardName\" like :Fornecedor"
+
+GET https://193.123.108.195:50000/b1s/v1/Items('1A1B3100') HTTP/1.1
+content-type: application/json
+
+{"DocDate":"2023-12-09","DocDueDate":"2023-12-26","TaxDate":"2023-12-09","RequesterName":2,"CardCode":"S2308452","SeriesString":"U","SequenceSerial":"340803","BPL_IDAssignedToInvoice":3,"SequenceModel":19,"SequenceCode":-2,"U_ChaveAcesso":"","DocumentLines":[{"ItemCode":"1006389","Description":"340803/U | 3222-9541","FreeText":"340803/U | 3222-9541","Quantity":1,"Price":"74.36","PriceAfterVAT":"74.36","UnitPrice":"74.36","Usage":null,"CostingCode":"20255","CostingCode2":"R20255","CostingCode5":"UF20001","CostingCode3":"P00000","ProjectCode":"00000","CostingCode4":"00000","CSTCode":"0.90","TaxCode":"NTRIB","AccountCode":"3315010.00020","FreeOfChargeBP":"tYes"}],"DocumentInstallments":[]}
+
+
+### prox
+
+POST https://sap-hstern-sl.skyinone.net:50000/b1s/v1/Login HTTP/1.1
+content-type: application/json
+
+{
+    "UserName": "LEONARDO.CARVALHO",
+    "Password": "654321",
+    "CompanyDB": "AMBAR"
+}
+
+###
+
+
+POST https://193.123.108.195:50000/b1s/v1/Login HTTP/1.1
+content-type: application/json
+
+{
+    "UserName": "LEONARDO.CARVALHO",
+    "Password": "654321",
+    "CompanyDB": "SIMULACAO_POA_JR"
+}
+
+GET https://193.123.108.195:50000/b1s/v1/193.123.108.195:50000/b1s/v1/SQLQueries('QAttachment')/List
+
+GET https://193.123.108.195:50000/b1s/v1/UserQueries?$select=QueryDescription&$filter=startswith(QueryDescription,'CtasPagarEmAberto') HTTP/1.1

@@ -1,0 +1,2 @@
+Telefone;CNPJFornec;Fornecedor;Especie;Emissao;TipoNota;NumeroNota;Serie;NumeroFatura;TotalNF;Valor;ValorBaseICMS;AliqICMS;Vencimento;Emp;Conta;Sconta;CC1;CC2;Projeto;GrupoPagto;CNPJConta;Competencia;DtGL;TipoCarga;EmpresaPgto;ChaveNFS;TipoServico;DebitoAutomatico;LinhaDigitavel
+1463050;002558157/0021-06;TELEFONICA;29/02/2024;16/02/2024;FATURA;14665643;0;;130;130,00;0;0;27/02/2024;10;3315020;00010;10141;14252;00000;ELETRONICO;0;022024;29/02/2024;TELEFONE;;;;SIM;826100000015 52276990000 002023159508 723001001046;
