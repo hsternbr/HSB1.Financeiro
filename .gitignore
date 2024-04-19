@@ -6,6 +6,7 @@
 *.prc
 *.txt
 *.txx
+*.csv
 
 # Logs
 logs

@@ -41,7 +41,6 @@ async function callService(serviceEndpoint) {
   }
 }
 
-
 function formataData(dt) {
     return dt == null ? null : dt.slice(6, 10) + '-' + dt.slice(3, 5) + '-' + dt.slice(0, 2);    
 }
@@ -50,7 +49,10 @@ function getUsage() {
     return null;   
 }
 
-async function getModel(tipoNota) {
+async function getModel(tipoNota, especie) {
+    if (especie === '821' || especie === '441')
+      return 28;
+
     var queryModel = `select id_b1 "id_b1" from modelo_doc_fiscal where cod_docto_msaf = '${tipoNota}'`;
     const retorno =  await ExecORA(queryModel);
       try {
@@ -96,6 +98,8 @@ async function getCardCode(docFornCod) {
 
 };
 
+let cfop = null;
+
 async function getBPLIdfromCCusto(ccusto){
     var auxCcusto;
 
@@ -110,7 +114,7 @@ async function getBPLIdfromCCusto(ccusto){
         auxCcusto = ccusto;
     }
 
-    var queryBPLIdfromCCusto = `select  e.bplid_b1 "bplid_b1"
+    var queryBPLIdfromCCusto = `select  e.bplid_b1 "bplid_b1", e.is_industria "is_industria"
     from    ccusto cc, estab e
     where   cc.estab_num = e.estab_num
     and    (ccusto_gl_cod = '${auxCcusto}' 
@@ -118,6 +122,7 @@ async function getBPLIdfromCCusto(ccusto){
 
     const retorno =   await ExecORA(queryBPLIdfromCCusto);
     try{
+        cfop = retorno[0].is_industria === 'S' ? '1302' : '1303';
         return retorno[0].bplid_b1;
     }catch(e){
         log.addTexto(`Erro ao buscar o BPLId para o CCusto: ${ccusto} \n ${e.message}`);
@@ -177,6 +182,30 @@ function getImpostos(valorICMS, aliquotaICMS) {
     return impostos;
 }
 
+async function defineCFOP(cardCode, BPLId){
+  var queryUF = `
+  select e.uf_cod 
+  from pessoa p, endereco e
+  where p.cod_forn_hsb1 = '${cardCode}'
+  and  p.pessoa_num = e.pessoa_num
+  and  p.pessoa_num = ${cardCode.slice(1)}
+  union
+  select e.uf_cod 
+  from estab es, endereco e
+  where es.bplid_b1 = '${BPLId}'
+  and  es.estab_num = e.pessoa_num
+`
+
+const retorno = await ExecORA(queryUF);
+try{
+    return retorno.length > 1 ? `2${cfop.slice(1)}` : cfop;
+}catch(e){
+    log.addTexto(`Erro ao buscar o BPLId para o CCusto: ${ccusto} \n ${e.message}`);
+    //log.gravarHS();
+    throw new Error("Não foi encontrado o BPLId para o CCusto: " + ccusto);
+}
+}
+
 const processCSVFile = async (filePath) => {
   let documento = [];
   let documentoAtual = null;
@@ -201,21 +230,24 @@ const processCSVFile = async (filePath) => {
         // If a new order, push the previous order to the array
         if (documentoAtual && documentoAtual.SequenceSerial != 0) {
           documento.push(documentoAtual);
+          cfop = null;
         }
 
         const funcoes = [
           await getCardCode(row["CNPJFornec"]),
           getBPLIdfromCCusto(row["EmpresaPgto"] == '' ? row["CC2"] : row["EmpresaPgto"]),
-          getModel(row["TipoNota"])
+          getModel(row["TipoNota"], row["Especie"])
         ];
       
         var cardCode, bplId, model;
         //const retornos = await Promise.all(funcoes);
         try {
-           [cardCode, bplId, model] =  await Promise.all(funcoes);   
-           //cardCode = await getCardCode(row["CNPJFornec"]);
-           //bplId = await getBPLIdfromCCusto(row["EmpresaPgto"] == '' ? row["CC1"] : row["EmpresaPgto"]);
-           //model = await getModel(row["TipoNota"]);       
+          [cardCode, bplId, model] =  await Promise.all(funcoes);
+          if (row["TipoNota"] !== "FATURA")
+            cfop = await defineCFOP(cardCode, bplId);
+          else
+            cfop = "1101";
+       
         } catch (error) {
             log.addTexto(error.message);
             console.log(error.message);
@@ -274,7 +306,7 @@ const processCSVFile = async (filePath) => {
         CostingCode4: "00000",*/
         CSTCode:"0.90",
         TaxCode:row["TipoNota"] !== "FATURA" ? "HSCODE54": "NTRIB",
-        CFOPCode:row["TipoNota"] !== "FATURA" ? "1303" : "1101",
+        CFOPCode: cfop,
         AccountCode: `${row["Conta"]}.${row["Sconta"]}`,
         FreeOfChargeBP: "tNO", //row["DebitoAutomatico"] === "SIM" ? "tYES" : "tNO",
         LineTaxJurisdictions: getImpostos(row["ValorBaseICMS"].replace(",","."), row["AliqICMS"].replace(",",".")),
@@ -354,9 +386,9 @@ watcher.on('add', async (path) => {
                 && file.toUpperCase().endsWith('.TXT')) {
       //const filePath = `${folderToMonitor}/${filename}`;
       console.log(`Processando arquivo: ${file}`);
-      await processCSVFile(path); // processCSVFile(filePath);
+      //(await async() => {setTimeout(),5000}); // processCSVFile(filePath);
+      const response = await processCSVFile(path); // processCSVFile(filePath);
+      console.log("Resposta:",response);
       setTimeout(() => {fs.renameSync(path, path.slice(0,-3).concat('prc'))},3000);
-    }
+      }
 });
-
-
