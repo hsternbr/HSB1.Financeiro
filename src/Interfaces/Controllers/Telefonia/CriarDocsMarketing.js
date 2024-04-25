@@ -53,7 +53,7 @@ async function getModel(tipoNota, especie) {
     if (especie === '821' || especie === '441')
       return 28;
 
-    var queryModel = `select id_b1 "id_b1" from modelo_doc_fiscal where cod_docto_msaf = '${tipoNota}'`;
+    var queryModel = `select id_b1 "id_b1" from modelo_doc_fiscal where cod_docto_msaf = '${tipoNota.trim()}'`;
     const retorno =  await ExecORA(queryModel);
       try {
           return retorno[0].id_b1;        
@@ -214,7 +214,9 @@ const processCSVFile = async (filePath) => {
 
   const stream = fs.createReadStream(filePath, { encoding: 'latin1' });
 
-  for await (const row of stream.pipe(csv({ separator: ';', cast_date: true }))) {
+  for await (const row of stream.pipe(csv({ separator: ';', 
+                                            cast_date: true , 
+                                            mapValues: ({ header, index, value }) => value.trim() }))) {
       console.log("Row:",row["NumeroNota"]) ;
 
       if (row["NumeroNota"] == null)
@@ -268,9 +270,9 @@ const processCSVFile = async (filePath) => {
         }
 
         documentoAtual = {
-          DocDate: formataData(row["Emissao"]),
+          DocDate: formataData(row["DtGL"]),
           DocDueDate: formataData(row['Vencimento']),
-          TaxDate: formataData(row['DtGL']),
+          TaxDate: formataData(row['Emissao']),
           CardCode: cardCode,
           JournalMemo: memo,
           SeriesString: row["Serie"],

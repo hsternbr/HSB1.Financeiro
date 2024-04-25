@@ -12,16 +12,11 @@
 import fs from "fs";
 import path from "path";
 
-function getNewFilesInFolder(folderPath, lastExecutionTime) {
-    const newFiles = [];
-    fs.readdirSync(folderPath).forEach((file) => {
-        const filePath = path.join(folderPath, file);
-        const fileStats = fs.statSync(filePath);
-        if (fileStats.mtimeMs > lastExecutionTime && filePath.endsWith(".csv")) {
-            newFiles.push(filePath);
-        }
-    });
-  return newFiles;
+function getNewFilesInFolderSince(folder, lastExecutionTime) {
+  return fs.readdirSync(folder)
+    .map(file => path.join(folder, file))
+    .filter(filePath => fs.statSync(filePath).mtimeMs > lastExecutionTime)
+    .filter(filePath => path.extname(filePath) === ".csv");
 }
 
-export default getNewFilesInFolder;
+export default getNewFilesInFolderSince;
