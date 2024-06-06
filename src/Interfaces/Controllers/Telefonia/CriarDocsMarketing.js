@@ -1,22 +1,47 @@
 import fs  from 'fs';
 import csv from 'csv-parser';
-import ExecORA  from '../../../../HSB1.Utilities/Infrastructure/connORA.js';
 import chokidar from 'chokidar';
-import execSAP from '../../../../HSB1.Utilities/Infrastructure/connSAP.js';
-import HSB1Log from '../../../../HSB1.Utilities/HSB1Log/HSB1LogModel.js';
 import path from 'path';
 import axios from 'axios';
 import dotenv from 'dotenv';
 
+import ExecORA from 'hsb1.utilities/Infrastructure/connORA.js';
+import execSAP from 'hsb1.utilities/Infrastructure/connSAP.js';
+import HSB1Log from 'hsb1.utilities/HSB1Log/HSB1LogModel.js';
+import  Email   from 'hsb1.utilities/Email/EnviaEmail.js';
+
+
+/* import ExecORA  from '../../../../HSB1.Utilities/Infrastructure/connORA.js';
+import execSAP from '../../../../HSB1.Utilities/Infrastructure/connSAP.js';
+import HSB1Log from '../../../../HSB1.Utilities/HSB1Log/HSB1LogModel.js'; */
+
+let file;
+
+const enviaEmail = (listaErros) => {
+  let erros = '';
+  if (listaErros.length > 0) {
+      listaErros.forEach(element => {
+        erros+= `<p>${element}</p>`
+      })
+    }
+      
+    Email("leonardo.carvalho@hstern.com.br",
+    ["contas.pagar@hstern.com.br","leonardo.carvalho@hstern.com.br"],
+    `Erro na Carga do SAP - ${file}`,
+    erros
+    );
+}
 
 //const pastaDestino = 'C:\\HS\\HSB1\\HSB1.Financeiro\\src\\Infrastructure\\Data\\Telefonia';
 const folderToMonitor = path.resolve() + '\\src\\Infrastructure\\Data\\Telefonia';
+
 //const folderToMonitor = '\\\\10.1.0.133\\interface_ebs\\prd'; // Replace with the path to the folder you want to monitor
 
 //const folderToMonitor = 'C:\\HS\\HSB1\\HSB1.Financeiro\\src\\Infrastructure\\Data\\Telefonia';
 
 dotenv.config();
 
+let errosCarga=[];
 let log = new HSB1Log(null, null);
 log.execucao = new Date().toLocaleDateString("pt-br");
 
@@ -65,7 +90,7 @@ async function getModel(tipoNota, especie) {
 async function getCardCode(docFornCod) {
   var queryCardCode = `
   SELECT  
-          min(pe.cod_forn_hsb1) "CardCode", min(pe.pessoa_num) "pessoa_num"
+          max(pe.cod_forn_hsb1) "CardCode", max(pe.pessoa_num) "pessoa_num"
   FROM    
           empresa e, estab es, pessoa pe
   WHERE   1 = 1 and
@@ -84,6 +109,8 @@ async function getCardCode(docFornCod) {
       if ((resultado.status > 200 && resultado.status < 300) || (resultado.status==undefined && resultado.data.CardCode !== null))
         if (resultado.status != 204) 
           auxCardCode = resultado.data.CardCode;
+        else
+        auxCardCode = `S${retorno[0].pessoa_num}`;
 
       if (auxCardCode == null && resultado.status != 204){
         log.addTexto(`Erro ao buscar o CardCode para o CNPJ: ${docFornCod} \n ${JSON.stringify(retorno)}`);
@@ -342,8 +369,6 @@ const processCSVFile = async (filePath) => {
 
     documento = documento.filter(doc => doc.SequenceSerial !== 0);
 
-    let errosCarga=[];
-    
     for (const doc of documento) {
       try {
         const response = await execSAP(
@@ -363,7 +388,8 @@ const processCSVFile = async (filePath) => {
             console.log(`${tipoCarga} - Doc. ${doc.SequenceSerial} não enviado. (${response.message})`);
             console.log(JSON.stringify(doc));
 
-            errosCarga.push(`${tipoCarga} - Doc. ${doc.SequenceSerial} não enviado. (${response.message})`)
+            errosCarga.push(`${tipoCarga} - Doc. ${doc.SequenceSerial} não enviado. (${response.message})`);
+
         }
       } catch (e) {
           log.tipo = "E";
@@ -373,6 +399,7 @@ const processCSVFile = async (filePath) => {
     }
 
     log.gravarHS();
+    enviaEmail(errosCarga);
 };
 
 console.log(`Monitorando a pasta: ${folderToMonitor}`);
@@ -387,15 +414,23 @@ watcher.on('ready', () => {
 });
 
 watcher.on('add', async (path) => {
-    let file = path.split('\\').slice(-1)[0];
+    file = path.split('\\').slice(-1)[0];
    // console.log(`Arquivo adicionado: ${file}`);
     if (file && (file.toUpperCase().startsWith('TELEFONE') || file.toUpperCase().startsWith('ALUGUEL')) 
                 && file.toUpperCase().endsWith('.TXT')) {
       //const filePath = `${folderToMonitor}/${filename}`;
       console.log(`Processando arquivo: ${file}`);
       //(await async() => {setTimeout(),5000}); // processCSVFile(filePath);
-      const response = await processCSVFile(path); // processCSVFile(filePath);
-      console.log("Resposta:",response);
-      setTimeout(() => {fs.renameSync(path, path.slice(0,-3).concat('prc'))},3000);
-      }
+      await processCSVFile(path); // processCSVFile(filePath);
+
+      let tentativas = 0;
+      do {
+              try {
+                setTimeout(() => {fs.renameSync(path, path.slice(0,-3).concat('prc'))},5000);
+                break;
+              } catch (error) {
+                tentativas++;
+              }
+      } while (tentativas < 10);
+    }
 });
