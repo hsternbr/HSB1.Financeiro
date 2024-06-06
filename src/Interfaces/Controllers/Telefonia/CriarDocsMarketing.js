@@ -15,7 +15,7 @@ import  Email   from 'hsb1.utilities/Email/EnviaEmail.js';
 import execSAP from '../../../../HSB1.Utilities/Infrastructure/connSAP.js';
 import HSB1Log from '../../../../HSB1.Utilities/HSB1Log/HSB1LogModel.js'; */
 
-let file;
+let arquivoProcessado;
 
 const enviaEmail = (listaErros) => {
   let erros = '';
@@ -26,8 +26,8 @@ const enviaEmail = (listaErros) => {
     }
       
     Email("leonardo.carvalho@hstern.com.br",
-    ["contas.pagar@hstern.com.br","leonardo.carvalho@hstern.com.br"],
-    `Erro na Carga do SAP - ${file}`,
+    ["contasapagar.rj@hstern.com.br","leonardo.carvalho@hstern.com.br"],
+    `Erro na Carga do SAP - ${arquivoProcessado}`,
     erros
     );
 }
@@ -414,14 +414,13 @@ watcher.on('ready', () => {
 });
 
 watcher.on('add', async (path) => {
-    file = path.split('\\').slice(-1)[0];
+    let file = path.split('\\').slice(-1)[0];
    // console.log(`Arquivo adicionado: ${file}`);
     if (file && (file.toUpperCase().startsWith('TELEFONE') || file.toUpperCase().startsWith('ALUGUEL')) 
                 && file.toUpperCase().endsWith('.TXT')) {
-      //const filePath = `${folderToMonitor}/${filename}`;
       console.log(`Processando arquivo: ${file}`);
-      //(await async() => {setTimeout(),5000}); // processCSVFile(filePath);
-      await processCSVFile(path); // processCSVFile(filePath);
+      arquivoProcessado = file;
+      await processCSVFile(path);
 
       let tentativas = 0;
       do {
