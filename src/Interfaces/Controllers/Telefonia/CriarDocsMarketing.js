@@ -78,23 +78,24 @@ async function getCardCode(docFornCod) {
   const retorno =   await ExecORA(queryCardCode);
 
   var auxCardCode = retorno[0].CardCode;
-  if (auxCardCode == null && retorno[0].pessoa_num) {
+  //if (auxCardCode == null && retorno[0].pessoa_num) {
       var resultado = await callService(`bp/enviarForn(${retorno[0].pessoa_num})`);
 
       if ((resultado.status > 200 && resultado.status < 300) || (resultado.status==undefined && resultado.data.CardCode !== null))
-        auxCardCode = resultado.data.CardCode;
+        if (resultado.status != 204) 
+          auxCardCode = resultado.data.CardCode;
 
-      if (auxCardCode == null){
+      if (auxCardCode == null && resultado.status != 204){
         log.addTexto(`Erro ao buscar o CardCode para o CNPJ: ${docFornCod} \n ${JSON.stringify(retorno)}`);
         //log.gravarHS();
         throw new Error(`Não foi encontrado o CardCode para o DocFornCod: ${docFornCod}` );
       }
       return auxCardCode;
-  }
+/*   }
     else{
       //console.error(`ATENÇÃO: Não foi encontrado o CardCode para o DocFornCod: ${queryCardCode}`);
       return auxCardCode;
-  }
+  } */
 
 };
 
@@ -314,7 +315,7 @@ const processCSVFile = async (filePath) => {
         LineTaxJurisdictions: getImpostos(row["ValorBaseICMS"].replace(",","."), row["AliqICMS"].replace(",",".")),
       };
       if (linhaAtual){
-        if (linhaAtual.FreeOfChargeBP === "tNO" && documentoAtual.DocumentInstallments.length === 0){
+        if (linhaAtual.FreeOfChargeBP === "tNO" && documentoAtual.DocumentInstallments[0] == undefined){
             documentoAtual.DocumentInstallments.push({
                 DueDate: formataData(row["Vencimento"]),
                 Total: parseFloat(row["TotalNF"].replace(",",".")),
