@@ -5,7 +5,7 @@
  * @return {object} The object with null properties removed.
  */
 export default function removeNullProperties(obj) {
-    const result = {};
+    const result = {}; 
   
     for (const key in obj) {
       const value = obj[key];
