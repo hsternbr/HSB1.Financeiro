@@ -342,6 +342,8 @@ const processCSVFile = async (filePath) => {
 
     documento = documento.filter(doc => doc.SequenceSerial !== 0);
 
+    let errosCarga=[];
+    
     for (const doc of documento) {
       try {
         const response = await execSAP(
@@ -356,10 +358,12 @@ const processCSVFile = async (filePath) => {
             log.tipo = log.tipo !== "E" && "I";
             console.log(`Doc. ${doc.SequenceSerial} de ${tipoCarga} enviado com sucesso`);
         } else {
-            log.addTexto(`Doc. ${doc.SequenceSerial} de ${tipoCarga} não enviado. (${response.message})`);
+            log.addTexto(`${tipoCarga} - Doc. ${doc.SequenceSerial} não enviado. (${response.message})`);
             log.tipo = "E";
-            console.log(`Doc. ${doc.SequenceSerial} de ${tipoCarga} não enviado. (${response.message})`);
+            console.log(`${tipoCarga} - Doc. ${doc.SequenceSerial} não enviado. (${response.message})`);
             console.log(JSON.stringify(doc));
+
+            errosCarga.push(`${tipoCarga} - Doc. ${doc.SequenceSerial} não enviado. (${response.message})`)
         }
       } catch (e) {
           log.tipo = "E";
