@@ -1,9 +1,3 @@
-/**
- * Removes null properties from an object recursively.
- *
- * @param {object} obj - The object to remove null properties from.
- * @return {object} The object with null properties removed.
- */
 export default function removeNullProperties(obj) {
     const result = {}; 
   
