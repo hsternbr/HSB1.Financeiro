@@ -399,7 +399,7 @@ const processCSVFile = async (filePath) => {
     }
 
     log.gravarHS();
-    enviaEmail(errosCarga);
+    !errosCarga.length > 0 && enviaEmail(errosCarga);
 };
 
 console.log(`Monitorando a pasta: ${folderToMonitor}`);
