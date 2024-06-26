@@ -14,7 +14,6 @@ var arquivosCopiados = [];
 
 // Function to copy new files
 async function copyNewFiles() {
-    console.log("Copiando Arquivos",new Date().toLocaleTimeString());
     try {
         let files = await readdir(networkFolderPath);
         const now = new Date();
@@ -34,7 +33,7 @@ async function copyNewFiles() {
                         continue;
                     }
                     await copyFile(filePath, destination, fs.constants.COPYFILE_EXCL);
-                    console.log(`Copied file: ${file}`);
+                    console.log(`Arquivo copiado: ${file}`);
                     arquivosCopiados.push(file);                    
                 }
                 catch(error){
