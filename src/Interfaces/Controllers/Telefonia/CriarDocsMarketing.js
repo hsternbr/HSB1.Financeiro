@@ -276,7 +276,7 @@ const processCSVFile = async (filePath) => {
           if (row["TipoNota"] !== "FATURA")
             cfop = await defineCFOP(cardCode, bplId);
           else
-            cfop = "1101";
+            cfop = "1000";
        
         } catch (error) {
             log.addTexto(error.message);
@@ -386,7 +386,7 @@ const processCSVFile = async (filePath) => {
             log.addTexto(`${tipoCarga} - Doc. ${doc.SequenceSerial} não enviado. (${response.message})`);
             log.tipo = "E";
             console.log(`${tipoCarga} - Doc. ${doc.SequenceSerial} não enviado. (${response.message})`);
-            console.log(JSON.stringify(doc));
+            //console.log(JSON.stringify(doc));
 
             errosCarga.push(`${tipoCarga} - Doc. ${doc.SequenceSerial} não enviado. (${response.message})`);
 
@@ -399,7 +399,8 @@ const processCSVFile = async (filePath) => {
     }
 
     log.gravarHS();
-    !errosCarga.length > 0 && enviaEmail(errosCarga);
+    console.log("ErrosCarga:",errosCarga.length);
+    !errosCarga.length === 0 && enviaEmail(errosCarga);
 };
 
 console.log(`Monitorando a pasta: ${folderToMonitor}`);
