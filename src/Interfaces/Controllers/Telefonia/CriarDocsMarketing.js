@@ -26,7 +26,7 @@ const enviaEmail = (listaErros) => {
     }
       
     Email("leonardo.carvalho@hstern.com.br",
-    ["contasapagar.rj@hstern.com.br","leonardo.carvalho@hstern.com.br"],
+    ["leonardo.carvalho@hstern.com.br"], ///"contasapagar.rj@hstern.com.br",
     `Erro na Carga do SAP - ${arquivoProcessado}`,
     erros
     );
@@ -162,11 +162,8 @@ async function getBPLIdfromCCusto(ccusto){
 function getReferencia(obj) {
     if (obj.TipoCarga == 'ALUGUEL')
         return "1008116";
-
-    if (obj.TipoCarga == 'TELEFONIA')
-        return "1006389";
-    
-    if (obj.TipoCarga == 'TELEFONIA')
+   
+    if (obj.TipoCarga == 'TELEFONE')
         if (obj.Conta == '3315010') {
             if (obj.Sconta == '00020')
                 return "1052960";
@@ -187,7 +184,7 @@ function getReferencia(obj) {
                 return "1051586";
             }
         
-        return "1006389";
+        return "1053829";
     }
 
 function getImpostos(valorICMS, aliquotaICMS) {
@@ -288,7 +285,7 @@ const processCSVFile = async (filePath) => {
 
 
         if (row["TipoCarga"] === "TELEFONE") {
-          referencia = "1006389";
+          referencia = "1053829";
           memo = `${row["TipoNota"]} ${row["NumeroNota"]} / ${row["Serie"]} | ${row["Fornecedor"]} | Pgto Telefonia`;
         }
         
@@ -381,7 +378,7 @@ const processCSVFile = async (filePath) => {
         if (response.status >= 200 && response.status < 300) {
             log.addTexto(`Doc. ${doc.SequenceSerial} de ${tipoCarga} enviado com sucesso. (${response.status})`);
             log.tipo = log.tipo !== "E" && "I";
-            console.log(`Doc. ${doc.SequenceSerial} de ${tipoCarga} enviado com sucesso`);
+            //console.log(`Doc. ${doc.SequenceSerial} de ${tipoCarga} enviado com sucesso`);
         } else {
             log.addTexto(`${tipoCarga} - Doc. ${doc.SequenceSerial} não enviado. (${response.message})`);
             log.tipo = "E";
