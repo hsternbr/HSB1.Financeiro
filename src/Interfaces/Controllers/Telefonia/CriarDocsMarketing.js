@@ -33,7 +33,7 @@ const enviaEmail = (listaErros) => {
 }
 
 //const pastaDestino = 'C:\\HS\\HSB1\\HSB1.Financeiro\\src\\Infrastructure\\Data\\Telefonia';
-const folderToMonitor = path.resolve() + '\\src\\Infrastructure\\Data\\Telefonia';
+const folderToMonitor = path.resolve() + '\\HSB1.Financeiro\\src\\Infrastructure\\Data\\Telefonia';
 
 //const folderToMonitor = '\\\\10.1.0.133\\interface_ebs\\prd'; // Replace with the path to the folder you want to monitor
 
@@ -237,6 +237,7 @@ const processCSVFile = async (filePath) => {
   var tempNumeroNota = null;
   var tipoCarga;
 
+  console.log("Processando CSV") ;
   const stream = fs.createReadStream(filePath, { encoding: 'latin1' });
 
   for await (const row of stream.pipe(csv({ separator: ';', 
@@ -413,7 +414,7 @@ watcher.on('ready', () => {
 
 watcher.on('add', async (path) => {
     let file = path.split('\\').slice(-1)[0];
-   // console.log(`Arquivo adicionado: ${file}`);
+    console.log(`Arquivo adicionado: ${file}`);
     if (file && (file.toUpperCase().startsWith('TELEFONE') || file.toUpperCase().startsWith('ALUGUEL')) 
                 && file.toUpperCase().endsWith('.TXT')) {
       console.log(`Processando arquivo: ${file}`);
