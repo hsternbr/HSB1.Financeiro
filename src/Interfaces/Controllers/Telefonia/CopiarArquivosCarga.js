@@ -52,9 +52,9 @@ async function copyNewFiles() {
         let filesToCopy = compareFileLists(networkFiles, localFiles);
         //networkFiles.filter(file => !localFiles.includes(file.replace(/\.[^.]*$/g, '')));
 
-
-        console.table(filesToCopy);        
+       
         console.log(`Arquivos a serem copiados: ${filesToCopy.length}`);
+        console.log(filesToCopy); 
         /*let files = await readdir(networkFolderPath);
         const now = new Date();
 		console.log(`Execução: ${now}`);
@@ -89,7 +89,6 @@ async function copyNewFiles() {
     }
 }
 
-console.log(new Date());
 // Run the function every 5 minutes
 let running = false;
 async function loop() {

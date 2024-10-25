@@ -414,7 +414,6 @@ watcher.on('ready', () => {
 
 watcher.on('add', async (path) => {
     let file = path.split('\\').slice(-1)[0];
-    console.log(`Arquivo adicionado: ${file}`);
     if (file && (file.toUpperCase().startsWith('TELEFONE') || file.toUpperCase().startsWith('ALUGUEL')) 
                 && file.toUpperCase().endsWith('.TXT')) {
       console.log(`Processando arquivo: ${file}`);
